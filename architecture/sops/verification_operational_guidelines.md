@@ -486,6 +486,46 @@ The following features are **reserved for future phases** and require:
 
 ---
 
+### Package Dependency Failures
+
+> **Added**: Blueprint Phase (B) — 2026-02-19T21:12:39+05:00
+> **Tool**: `tools/core/python_package_check.py` (created in Link phase)
+
+**Common Causes**:
+- Incomplete Python installation (stdlib module absent)
+- Python environment misconfiguration
+- Mismatched Python interpreter (system Python vs. virtual environment)
+
+**Failure Signature**:
+- `status: "error"` in the `python_packages` verification result
+- `missing_list` contains one or more package names
+- `checks.missing` is greater than 0
+
+**Remediation**:
+1. Review the `missing_list` field in the verification JSON output
+2. Confirm correct Python interpreter is active:
+   ```
+   python --version
+   which python   (Linux/macOS)
+   where python   (Windows)
+   ```
+3. For stdlib packages (e.g., `pathlib`, `importlib`): upgrade Python to ≥ 3.8
+4. If a virtual environment is in use, ensure it is activated before running verification
+5. Re-run `python cli/main.py verify`
+
+**Critical Constraint**:
+- DO NOT attempt to run `pip install` as a remediation step inside the system
+- The Python Package Validator is read-only and offline (Invariant #6)
+- Package installation is a user-environment responsibility, not a system responsibility
+
+**Prevention**: Use a supported Python version (≥ 3.8) with a complete stdlib installation
+
+**Logging**:
+- ERROR level: `"Check failed: python_packages — N missing packages: [list]"`
+- Include `missing_list` in log entry for traceability
+
+---
+
 ## Summary
 
 Verification operational guidelines ensure:
@@ -496,3 +536,72 @@ Verification operational guidelines ensure:
 5. **Invariant Preservation**: Core principles (linear execution, determinism) enforced
 
 **Operational Hardening**: Strengthens system stability through refined documentation and display behavior without modifying execution flow.
+
+---
+
+---
+
+### Workspace Hygiene Failures
+
+> **Added**: Blueprint Phase (B) — 2026-02-19T21:55:00+05:00
+> **Tool**: `tools/core/workspace_hygiene_check.py` (Implementation Target)
+
+**Common Causes**:
+- New script created in root (`script.py`) instead of `tools/`
+- Architecture file placed in root of `architecture/` instead of subdirectory (if applicable)
+- Config file in root instead of `config/`
+
+**Failure Signature**:
+- `status: "error"` in `workspace_hygiene`
+- `violations` list contains file paths
+
+**Remediation**:
+1. Review the `violations` list in the output.
+2. Move files to their appropriate "A.N.T." layer directories:
+   - Scripts -> `tools/` or `cli/scripts/`
+   - Docs -> `architecture/` subdirectories
+   - Configs -> `config/`
+3. Delete unnecessary temporary files or move to `.tmp/`.
+
+**Critical Constraint**:
+- The tool is **Read-Only**. It will NOT move files for you.
+- User intervention is required to maintain intent.
+
+**Prevention**:
+- Adhere to "A.N.T. Layer Separation" (Invariant #2) during development.
+
+---
+
+### Python Syntax Failures
+
+> **Added**: Blueprint Phase (B) — 2026-02-19T22:06:03+05:00
+> **Tool**: `tools/core/python_syntax_check.py` (Implementation Target)
+
+**Common Causes**:
+- Typo in Python code (`pirnt` instead of `print`)
+- Missing colons (`def foo()`)
+- Indentation errors (mixing tabs/spaces)
+- Copy-paste errors
+
+**Failure Signature**:
+- `status: "error"` in `python_syntax`
+- `syntax_errors` list populated with file paths and messages
+
+**Remediation**:
+1. Open the file specified in the violation list.
+2. Go to the line number indicated.
+3. Fix the syntax error (IDE will usually highlight it).
+4. Save and re-run.
+
+**Critical Constraint**:
+- Tool checks syntax ONLY. It does not check types or logic.
+- A passing syntax check does not guarantee the code works.
+
+**Prevention**:
+- Use an IDE with linting.
+- Run `python -m py_compile <file>` locally before committing.
+
+---
+
+**Last Updated**: 2026-02-19T22:06:03+05:00
+**Blueprint Extension**: Python Syntax guidelines added

@@ -26,14 +26,14 @@
 
 **System State**: 🔒 **Dormant — Sealed and Operational**
 
-- ✅ **30 architecture documents** (SOPs, specifications, core governance)
-- ✅ **8 operational code modules** (Tools, Navigation, CLI, Display layers)
+- ✅ **30+ architecture documents** (SOPs, specifications, core governance)
+- ✅ **11 operational code modules** (Tools, Navigation, CLI, Display layers)
 - ✅ **12 enforced invariants** (9 untouchable, protecting system integrity)
-- ✅ **Linear verification pipeline** (4 tools executing sequentially)
+- ✅ **Linear verification pipeline** (7 tools executing sequentially)
 - ✅ **CLI verify command** (fully functional presentation layer)
 
 **Milestone**: [`architecture/core/dormant_state_seal.md`](architecture/core/dormant_state_seal.md)  
-**Date Sealed**: 2026-02-13T22:34:53+05:00
+**Date Sealed**: 2026-02-19T22:34:53+05:00
 
 ---
 
@@ -62,9 +62,14 @@ Glaido Omni-Nexus follows the **A.N.T. Architecture**:
 **Purpose**: Execute domain-specific logic  
 **Location**: `tools/`
 
-- **Core Tools**: Dependency checks, filesystem integrity, schema validation
-- **Agent Tools**: Registry management, spawner utilities
-- **Data Tools**: File operations, validation utilities
+- **Core Tools**:
+  - `local_dependencies`: Environment validation
+  - `workspace_hygiene`: File structure enforcement
+  - `python_syntax`: Static code analysis
+  - `filesystem_integrity`: Core path verification
+  - `python_packages`: Dependency checking
+  - `schema_validation`: Data contract enforcement
+- **Agent Tools**: Registry management
 - **Output**: Structured JSON conforming to data contracts
 
 ### 4️⃣ CLI Layer (Presentation)
@@ -116,9 +121,12 @@ CLI Entry Point (main.py)
     ↓
 Verification Orchestrator (verification_orchestrator.py)
     ↓
-Sequential Tool Execution (4 verification tools)
+Sequential Tool Execution (7 verification tools)
     ├── Local Dependency Check
+    ├── Workspace Hygiene Validator
+    ├── Python Syntax Validator
     ├── Filesystem Integrity Check
+    ├── Python Package Validator
     ├── Schema Validator Stub
     └── Registry Readiness Check
     ↓
@@ -505,3 +513,33 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 *Built with discipline. Scaled with control. Governed by invariants.*
+
+---
+
+## 📅 Release Notes
+
+### Release v0.3.0 — Stable Verification Core
+**Date**: 2026-02-19
+**Status**: Stable — Dormant Expansion Mode
+
+This release solidifies the core verification pipeline with 3 major expansion cycles completed.
+
+#### Features
+- **7-Tool Verification Pipeline**:
+  1. `local_dependencies`: Enforces Python 3.8+ and stdlib modules.
+  2. `workspace_hygiene`: Enforces clean root and directory structure (Read-Only).
+  3. `python_syntax`: Prevents runtime crashes via static AST analysis.
+  4. `filesystem_integrity`: Ensures all 18 core directories exist.
+  5. `python_packages`: Verifies 7 required Python packages.
+  6. `schema_validation`: Checks data contract validators.
+  7. `agent_registry`: Validates agent state files.
+
+#### Expansion History
+- **Cycle #1 (Python Packages)**: Added dependency validation.
+- **Cycle #2 (Workspace Hygiene)**: Added structure enforcement.
+- **Cycle #3 (Python Syntax)**: Added static code analysis.
+
+#### Architecture
+- **Offline-First**: 100% local execution.
+- **Linear Pipeline**: Deterministic, sequential execution order.
+- **Expansion-Driven**: All features added via strict B.L.A.S.T. protocol.

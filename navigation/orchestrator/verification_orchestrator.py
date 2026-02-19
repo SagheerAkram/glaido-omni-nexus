@@ -86,11 +86,15 @@ def run_sequential_verification():
     workspace = get_workspace_root()
     
     # Define tool paths in sequential order
+    # Architect Phase (2026-02-19): python_package_check inserted at position 3
     tools = [
-        ("local_dependencies", workspace / "tools/core/local_dependency_check.py"),
-        ("filesystem_integrity", workspace / "tools/core/filesystem_integrity_check.py"),
-        ("schema_validation", workspace / "tools/core/schema_validator_stub.py"),
-        ("agent_registry", workspace / "tools/agents/registry_readiness_check.py")
+        ("local_dependencies",    workspace / "tools/core/local_dependency_check.py"),
+        ("workspace_hygiene",     workspace / "tools/core/workspace_hygiene_check.py"),
+        ("python_syntax",         workspace / "tools/core/python_syntax_check.py"),
+        ("filesystem_integrity",  workspace / "tools/core/filesystem_integrity_check.py"),
+        ("python_packages",       workspace / "tools/core/python_package_check.py"),
+        ("schema_validation",     workspace / "tools/core/schema_validator_stub.py"),
+        ("agent_registry",        workspace / "tools/agents/registry_readiness_check.py"),
     ]
     
     # Execute each tool sequentially

@@ -28,6 +28,11 @@ def check_validator_exists():
 def check_validator_importable():
     """Test if validator can be imported"""
     try:
+        # Add workspace root to sys.path to allow absolute imports
+        workspace = Path(__file__).resolve().parents[2]
+        if str(workspace) not in sys.path:
+            sys.path.insert(0, str(workspace))
+
         # Attempt import
         import tools.core.validator as validator
         

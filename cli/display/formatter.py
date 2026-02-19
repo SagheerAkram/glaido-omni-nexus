@@ -71,19 +71,25 @@ def black(text: str, bold: bool = False) -> str:
     return color(text, "black", bold=bold)
 
 
+# Semantic colors — per cli_branding_guidelines.md §Semantic Color Extensions
+RED = "\033[91m"
+YELLOW = "\033[93m"
+CYAN = "\033[96m"
+
+
 def red(text: str) -> str:
-    """Apply red color (using white + dim for error) to text."""
-    return f"{DIM}{WHITE}{text}{RESET}"
+    """Apply red color (error state) per branding spec."""
+    return f"{RED}{text}{RESET}"
 
 
 def yellow(text: str) -> str:
-    """Apply yellow color (using white for warning) to text."""
-    return f"{WHITE}{text}{RESET}"
+    """Apply yellow color (warning state) per branding spec."""
+    return f"{YELLOW}{text}{RESET}"
 
 
 def cyan(text: str) -> str:
-    """Apply cyan color (using lime for info) to text."""
-    return f"{LIME_GREEN}{text}{RESET}"
+    """Apply cyan color (info state) per branding spec."""
+    return f"{CYAN}{text}{RESET}"
 
 
 def bold(text: str) -> str:

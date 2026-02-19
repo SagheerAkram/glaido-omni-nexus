@@ -3,6 +3,48 @@ Navigation: Task Router
 Purpose: Route incoming tasks to appropriate agents/tools
 Category: navigation/routing
 Created: 2026-02-13T21:06:00+05:00
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DORMANT MODULE NOTICE
+Status:  NOT ACTIVE — Phase 6.4 Dormant State
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[1] MODULE EXECUTION BLOCKED
+    This module IS imported by cli/main.py and the `route`
+    CLI command IS wired to call route_task(). However,
+    execution is intentionally blocked at the CLI layer by
+    a Dormant Execution Guard in cmd_route() that intercepts
+    all calls before they reach this module and returns
+    without invoking any routing logic.
+    It was implemented during Phase 3 (Architect) as
+    scaffolding for future expansion.
+
+[2] CLI ROUTE COMMAND WIRED — EXECUTION BLOCKED DURING DORMANT STATE
+    The `route` command in cli/main.py imports this module
+    but is guarded by a dormant-state check that prevents
+    actual invocation. The only active execution entry point
+    is: navigation/orchestrator/verification_orchestrator.py
+    Task routing remains sealed behind Expansion Gate approval
+    (Invariant #12). This module remains present for future
+    expansion cycles.
+
+[3] MIGRATION REQUIRED BEFORE ACTIVATION
+    The functions _determine_route_type() and _determine_target()
+    contain conditional branching logic (if/elif chains and
+    registry lookups) that exceeds the "thin orchestration"
+    threshold defined in Invariant #2 (A.N.T. Layer Separation).
+    Before this module is wired to the CLI:
+        • Branching decision logic must be extracted and migrated
+          to the tools/ layer (e.g., tools/core/routing_engine.py)
+        • This module must be reduced to pure pass-through routing
+        • Architecture SOP must be updated to reflect the new split
+        • Full Expansion B.L.A.S.T. cycle must be completed
+
+    Failure to perform this migration will violate Invariant #2.
+
+DO NOT REMOVE THIS NOTICE until the above migration is complete
+and the Expansion Gate has been explicitly unlocked by the user.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
 import sys

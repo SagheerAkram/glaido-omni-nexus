@@ -141,7 +141,18 @@ def cmd_diagnostic(args):
 
 def cmd_route(args):
     """Test task routing."""
-    if not args.task:
+    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    # DORMANT EXECUTION GUARD — Phase 6.4 Dormant State
+    # Navigation routing is sealed until Expansion Gate unlock.
+    # DO NOT remove this guard without completing the full
+    # Expansion B.L.A.S.T. cycle and user approval.
+    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    print("[!] ROUTE COMMAND DISABLED — SYSTEM IN DORMANT STATE")
+    print("    Navigation routing remains sealed until Expansion Gate unlock.")
+    return 0
+    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    if not args.task:  # noqa: unreachable — preserved for expansion activation
         error("--task argument required", service="cli")
         return
     

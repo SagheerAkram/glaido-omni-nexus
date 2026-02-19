@@ -677,5 +677,234 @@ This specification serves as the reference for implementing CLI display logic in
 
 ---
 
-**Last Updated**: 2026-02-13T21:40:00+05:00  
-**Status**: Stylize specification — awaiting CLI implementation
+---
+
+## Python Package Validator Display
+
+> **Added**: Blueprint Phase (B) — 2026-02-19T21:12:39+05:00
+> **Expansion Source**: `architecture/specifications/python_package_check_spec.md`
+
+### Category Key
+
+**JSON key**: `python_packages`
+**Display label**: `Python Packages`
+
+---
+
+### Minimum Display (All Packages Present)
+
+**Trigger**: `status = "ready"` in the `python_packages` result block
+
+**Required Fields**:
+- `"Python Packages: [STATUS]"` — e.g., `Python Packages: READY`
+- Available package count — e.g., `7 of 7 packages available`
+- Execution confirmation — e.g., `All required packages importable`
+
+**Status Indicator**: ✅ (success) or `[PASS]` in plain-text fallback
+
+---
+
+### Expanded Display (One or More Packages Missing)
+
+**Trigger**: `status = "error"` AND `missing_list` is non-empty
+
+**Required Fields**:
+- `"Python Packages: ERROR"`
+- Count: `N of M packages available`
+- Missing package list (bulleted):
+  ```
+  Missing Packages:
+    • <package_name>
+    • <package_name>
+  ```
+- Remediation pointer — see `verification_operational_guidelines.md §Package Dependency Failures`
+
+**Status Indicator**: ❌ (error) or `[FAIL]` in plain-text fallback
+
+---
+
+### Display Example: Success State
+
+```
+  Python Packages         ✅ READY
+  ─────────────────────────────────────────
+  7 of 7 packages importable
+  All required packages available
+```
+
+---
+
+### Display Example: Failure State
+
+```
+  Python Packages         ❌ ERROR
+  ─────────────────────────────────────────
+  5 of 7 packages importable
+  Missing Packages:
+    • pathlib
+    • importlib
+
+  Action: Verify Python installation completeness.
+          Expected packages must be importable via importlib.util.find_spec().
+```
+
+---
+
+### Tone and Language Rules
+
+**Success**: Consistent with other READY tools — no emphasis needed
+**Failure**: Direct, package names listed explicitly, no ambiguity in what is missing
+
+**Prohibited**:
+- Suggesting `pip install` as a remediation step (violates Invariant #6 — the tool is offline/read-only; installs are a user responsibility outside the system)
+- Version numbers in the output (phase-1 scope does not check versions)
+- Listing packages that are present (only missing packages surface in the expanded view)
+
+---
+
+---
+
+## Workspace Hygiene Display
+
+> **Added**: Blueprint Phase (B) — 2026-02-19T21:49:15+05:00
+> **Expansion Source**: `architecture/specifications/workspace_hygiene_check_spec.md`
+
+### Category Key
+
+**JSON key**: `workspace_hygiene`
+**Display label**: `Workspace Hygiene`
+
+---
+
+### Minimum Display (Clean Workspace)
+
+**Trigger**: `status = "ready"` in the `workspace_hygiene` result block
+
+**Required Fields**:
+- `"Workspace Hygiene: [STATUS]"` — e.g., `Workspace Hygiene: READY`
+- Metric summary — e.g., `Root clean, Architecture clean`
+- Execution confirmation — e.g., `No violations found`
+
+**Status Indicator**: ✅ (success) or `[PASS]` in plain-text fallback
+
+---
+
+### Expanded Display (Violations Detected)
+
+**Trigger**: `status = "error"` AND `violations` list is non-empty
+
+**Required Fields**:
+- `"Workspace Hygiene: ERROR"`
+- Violation count: `N violations detected`
+- Violation list (bulleted with location):
+  ```
+  Violations:
+    • [root] Unknown file: test.py
+    • [tools] Misplaced file: script.sh
+  ```
+- Remediation pointer — see `verification_operational_guidelines.md §Workspace Hygiene Failures`
+
+**Status Indicator**: ❌ (error) or `[FAIL]` in plain-text fallback
+
+---
+
+### Display Example: Success State
+
+```
+  Workspace Hygiene       ✅ READY
+  ─────────────────────────────────────────
+  No violations found
+  Root and Architecture directories clean
+```
+
+---
+
+### Display Example: Failure State
+
+```
+  Workspace Hygiene       ❌ ERROR
+  ─────────────────────────────────────────
+  3 violations detected
+  Violations:
+    • [root] Unknown file: temp.py
+    • [root] Unknown file: data.json
+    • [architecture] Misplaced file: draft.txt
+
+  Action: Move files to .tmp/ or appropriate subdirectories.
+          Root must contain only allowed configuration files.
+```
+
+---
+
+## Python Syntax Display
+
+> **Added**: Blueprint Phase (B) — 2026-02-19T22:06:03+05:00
+> **Expansion Source**: `architecture/specifications/python_syntax_validator_spec.md`
+
+### Category Key
+
+**JSON key**: `python_syntax`
+**Display label**: `Python Syntax`
+
+---
+
+### Minimum Display (Success)
+
+**Trigger**: `status = "ready"`
+
+**Required Fields**:
+- `"Python Syntax: [STATUS]"`
+- Metric summary — e.g., `85 files scanned`
+- Execution confirmation — e.g., `Syntax valid`
+
+**Status Indicator**: ✅ (success)
+
+---
+
+### Expanded Display (Failure)
+
+**Trigger**: `status = "error"`
+
+**Required Fields**:
+- `"Python Syntax: ERROR"`
+- Violation count: `N syntax errors detected`
+- Violation list (bulleted with location):
+  ```
+  Violations:
+    • [tools/core/script.py:45] unexpected indent
+    • [cli/main.py:12] invalid syntax
+  ```
+- Remediation pointer
+
+**Status Indicator**: ❌ (error)
+
+---
+
+### Display Example: Success State
+
+```
+  Python Syntax           ✅ READY
+  ─────────────────────────────────────────
+  Syntax valid
+  85 files scanned
+```
+
+---
+
+### Display Example: Failure State
+
+```
+  Python Syntax           ❌ ERROR
+  ─────────────────────────────────────────
+  2 syntax errors detected
+  Violations:
+    • [tools/core/bad.py:10] unexpected indent
+    • [cli/utils.py:5] invalid syntax
+
+  Action: Fix syntax errors at reported lines.
+```
+
+---
+
+**Last Updated**: 2026-02-19T22:06:03+05:00
+**Status**: Blueprint Phase — Python Syntax Added

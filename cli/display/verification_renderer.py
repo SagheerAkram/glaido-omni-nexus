@@ -85,11 +85,15 @@ def _build_success_rows(verifications):
     rows = []
     
     # Define display order and labels
+    # Stylize Phase (2026-02-19): python_packages added at position 3
     tool_labels = {
-        "local_dependencies": "Local Dependencies",
+        "local_dependencies":   "Local Dependencies",
+        "workspace_hygiene":    "Workspace Hygiene",
+        "python_syntax":        "Python Syntax",
         "filesystem_integrity": "Filesystem Integrity",
-        "schema_validation": "Schema Validation",
-        "agent_registry": "Agent Registry"
+        "python_packages":      "Python Packages",
+        "schema_validation":    "Schema Validation",
+        "agent_registry":       "Agent Registry",
     }
     
     for category, label in tool_labels.items():
@@ -116,17 +120,30 @@ def _extract_success_details(category, tool_data):
     if category == "local_dependencies":
         py_ver = tool_data.get("python_version", {}).get("current", "")
         return f"Python {py_ver}" if py_ver else "All OK"
-    
+
     elif category == "filesystem_integrity":
         return "All directories present"
-    
+
+    elif category == "workspace_hygiene":
+        return "Workspace structure verified"
+
+    elif category == "python_syntax":
+        return "No syntax errors detected"
+
+    elif category == "python_packages":
+        # Reads from results.packages_checked — no execution, presentation only
+        results = tool_data.get("results", {})
+        total   = results.get("packages_checked", 0)
+        present = results.get("packages_present", total)
+        return f"All {total} packages importable" if present == total else f"{present}/{total} present"
+
     elif category == "schema_validation":
         return "Validator importable"
-    
+
     elif category == "agent_registry":
         count = tool_data.get("agent_count", 0)
         return f"{count} agents"
-    
+
     return "OK"
 
 
@@ -305,6 +322,41 @@ def _extract_error_details(category, tool_data):
         if missing_files:
             details.append(f"Missing files: {', '.join(missing_files)}")
     
+    elif category == "workspace_hygiene":
+        violations = tool_data.get("results", {}).get("violations", [])
+        count = len(violations)
+        details.append(f"{count} violation(s) detected")
+        if violations:
+            first = violations[0]
+            details.append(f"Example: {first.get('path')} ({first.get('rule')})")
+    
+    elif category == "python_syntax":
+        violations = tool_data.get("results", {}).get("violations", [])
+        count = len(violations)
+        details.append(f"{count} syntax error(s) detected")
+        if violations:
+            first = violations[0]
+            line = first.get('line', '?')
+            details.append(f"First error: {first.get('file')}:{line}")
+    
+    elif category == "python_packages":
+        # Display contract: list each missing package with install advisory
+        results      = tool_data.get("results", {})
+        total        = results.get("packages_checked", 0)
+        present      = results.get("packages_present", 0)
+        missing_pkgs = [
+            d["name"]
+            for d in results.get("details", [])
+            if d.get("status") == "missing"
+        ]
+        details.append(f"{present} of {total} packages importable")
+        for pkg in missing_pkgs:
+            details.append(formatter.red(f"\u2022 {pkg}") + " \u2014 not installed")
+        if missing_pkgs:
+            details.append(
+                formatter.cyan("\u2192 Install missing packages manually (offline-first rule)")
+            )
+    
     elif category == "schema_validation":
         if not tool_data.get("validator_import", {}).get("importable"):
             details.append("Schema validator not importable")
@@ -321,32 +373,57 @@ def _extract_error_details(category, tool_data):
 def _extract_remediation(verifications):
     """Extract remediation steps for failures"""
     steps = []
-    
+
     for category, tool_data in verifications.items():
         status = tool_data.get("status", "")
-        
+
         if status not in ["ready", "healthy", "degraded"]:
             if category == "local_dependencies":
                 if not tool_data.get("python_version", {}).get("meets_requirement"):
                     steps.append("Upgrade Python to version 3.8 or higher")
-                
+
                 missing_modules = tool_data.get("modules", {}).get("missing", [])
                 if missing_modules:
                     steps.append(f"Install missing modules: {', '.join(missing_modules)}")
-            
+
             elif category == "filesystem_integrity":
                 missing_dirs = tool_data.get("directories", {}).get("missing", [])
                 if missing_dirs:
                     steps.append("Create missing directories using project structure")
-            
+
+            elif category == "workspace_hygiene":
+                if tool_data.get("remediation"):
+                    steps.append(tool_data["remediation"])
+
+            elif category == "python_syntax":
+                if tool_data.get("remediation"):
+                    steps.append(tool_data["remediation"])
+
+            elif category == "python_packages":
+                # Offline-first: direct user to manual installation only
+                missing_pkgs = [
+                    d["name"]
+                    for d in tool_data.get("results", {}).get("details", [])
+                    if d.get("status") == "missing"
+                ]
+                if missing_pkgs:
+                    steps.append(
+                        "Verify Python installation completeness — "
+                        "missing: " + ", ".join(missing_pkgs)
+                    )
+                    steps.append(
+                        "See architecture/sops/verification_operational_guidelines.md "
+                        "\u00a7Package Dependency Failures for remediation guidance"
+                    )
+
             elif category == "schema_validation":
                 if not tool_data.get("validator_file", {}).get("exists"):
                     steps.append("Create tools/core/validator.py module")
-            
+
             elif category == "agent_registry":
                 if not tool_data.get("registry_exists"):
                     steps.append("Create agents/_registry.json file")
-    
+
     return steps
 
 
@@ -357,11 +434,15 @@ def _extract_remediation(verifications):
 def _format_tool_status_line(category, tool_data, show_warnings=False, show_errors=False):
     """Format a single tool status line"""
     # Get human-readable label
+    # Stylize Phase (2026-02-19): python_packages added
     labels = {
-        "local_dependencies": "Local Dependencies",
+        "local_dependencies":   "Local Dependencies",
+        "workspace_hygiene":    "Workspace Hygiene",
+        "python_syntax":        "Python Syntax",
         "filesystem_integrity": "Filesystem Integrity",
-        "schema_validation": "Schema Validation",
-        "agent_registry": "Agent Registry"
+        "python_packages":      "Python Packages",
+        "schema_validation":    "Schema Validation",
+        "agent_registry":       "Agent Registry",
     }
     
     label = labels.get(category, category.replace("_", " ").title())
