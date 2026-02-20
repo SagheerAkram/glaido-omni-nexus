@@ -1,0 +1,312 @@
+{
+  "metrics": {
+    "duration_ms": 129.76,
+    "integrity_score": 100.0,
+    "stability_index": 100.0,
+    "structural_risk_level": "NONE",
+    "tools_passed": 10,
+    "total_tools_verified": 10
+  },
+  "pipeline_state": {
+    "execution_order": [
+      "local_dependencies",
+      "workspace_hygiene",
+      "python_syntax",
+      "ant_boundary",
+      "orphaned_tools",
+      "architecture_links",
+      "filesystem_integrity",
+      "python_packages",
+      "schema_validation",
+      "agent_registry"
+    ],
+    "orchestrator": "verification_orchestrator",
+    "overall_status": "ready",
+    "verifications": {
+      "agent_registry": {
+        "agent_count": 0,
+        "backup_functional": true,
+        "category": "agent_registry",
+        "errors": [],
+        "executed": true,
+        "exit_code": 0,
+        "registry_exists": true,
+        "registry_valid_json": true,
+        "registry_valid_structure": true,
+        "registry_writable": true,
+        "status": "ready"
+      },
+      "ant_boundary": {
+        "actionable": false,
+        "category": "ant_boundary",
+        "executed": true,
+        "exit_code": 0,
+        "message": "Layer boundaries respected",
+        "metrics": {
+          "duration_ms": 30
+        },
+        "remediation": null,
+        "results": {
+          "violations": []
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T09:43:50.982473+00:00"
+      },
+      "architecture_links": {
+        "actionable": false,
+        "category": "architecture_links",
+        "executed": true,
+        "exit_code": 0,
+        "message": "No broken architecture links",
+        "metrics": {
+          "duration_ms": 18
+        },
+        "remediation": null,
+        "results": {
+          "violations": []
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T09:43:51.136802+00:00"
+      },
+      "filesystem_integrity": {
+        "actionable": false,
+        "category": "filesystem_integrity",
+        "executed": true,
+        "exit_code": 0,
+        "message": "Filesystem integrity verified",
+        "metrics": {
+          "duration_ms": 5.16
+        },
+        "remediation": null,
+        "results": {
+          "architecture_immutable": true,
+          "core_files": {
+            "empty": [],
+            "found": 4,
+            "missing": [],
+            "required": 4,
+            "unreadable": []
+          },
+          "directories": {
+            "found": 18,
+            "missing": [],
+            "required": 18
+          },
+          "temp_writable": true
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T14:43:51.208305+05:00"
+      },
+      "local_dependencies": {
+        "actionable": false,
+        "category": "local_dependencies",
+        "executed": true,
+        "exit_code": 0,
+        "message": "Local dependencies verified",
+        "metrics": {
+          "duration_ms": 26.66
+        },
+        "remediation": null,
+        "results": {
+          "filesystem": {
+            "error": null,
+            "writable": true
+          },
+          "modules": {
+            "all_available": true,
+            "available": [
+              "json",
+              "pathlib",
+              "sys",
+              "shutil",
+              "datetime",
+              "argparse",
+              "subprocess"
+            ],
+            "missing": [],
+            "required": [
+              "json",
+              "pathlib",
+              "sys",
+              "shutil",
+              "datetime",
+              "argparse",
+              "subprocess"
+            ]
+          },
+          "python_version": {
+            "current": "3.14",
+            "meets_requirement": true,
+            "required": "3.8"
+          }
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T14:43:50.712574+05:00"
+      },
+      "orphaned_tools": {
+        "actionable": false,
+        "category": "orphaned_tools",
+        "executed": true,
+        "exit_code": 0,
+        "message": "All tools registered",
+        "metrics": {
+          "duration_ms": 2
+        },
+        "remediation": null,
+        "results": {
+          "violations": []
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T09:43:51.058122+00:00"
+      },
+      "python_packages": {
+        "actionable": false,
+        "category": "python_packages",
+        "executed": true,
+        "exit_code": 0,
+        "message": "All 7 required packages are importable via importlib.util.find_spec()",
+        "metrics": {
+          "duration_ms": 0.46
+        },
+        "remediation": "Install missing packages manually or verify your Python installation includes the expected stdlib modules. See architecture/sops/verification_operational_guidelines.md \u00a7Package Dependency Failures for full guidance.",
+        "results": {
+          "details": [
+            {
+              "name": "json",
+              "status": "present"
+            },
+            {
+              "name": "pathlib",
+              "status": "present"
+            },
+            {
+              "name": "importlib",
+              "status": "present"
+            },
+            {
+              "name": "subprocess",
+              "status": "present"
+            },
+            {
+              "name": "sys",
+              "status": "present"
+            },
+            {
+              "name": "io",
+              "status": "present"
+            },
+            {
+              "name": "argparse",
+              "status": "present"
+            }
+          ],
+          "packages_checked": 7,
+          "packages_missing": 0,
+          "packages_present": 7
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T14:43:51+05:00"
+      },
+      "python_syntax": {
+        "actionable": false,
+        "category": "python_syntax",
+        "executed": true,
+        "exit_code": 0,
+        "message": "Syntax valid",
+        "metrics": {
+          "duration_ms": 35.54
+        },
+        "remediation": null,
+        "results": {
+          "files_checked": 33,
+          "scanned_directories": [
+            "tools",
+            "navigation",
+            "cli"
+          ],
+          "syntax_errors": 0,
+          "violations": []
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T14:43:50.886651+05:00"
+      },
+      "schema_validation": {
+        "actionable": false,
+        "category": "schema_validation",
+        "executed": true,
+        "exit_code": 0,
+        "message": "Schema validator stub verified",
+        "metrics": {
+          "duration_ms": 7.69
+        },
+        "remediation": null,
+        "results": {
+          "schema_documentation": {
+            "documented_schemas": {
+              "agent_config": true,
+              "routing_decision": false,
+              "tool_execution": false
+            },
+            "exists": true
+          },
+          "validator_file": {
+            "exists": true,
+            "path": "C:\\Users\\SM\\Desktop\\Github Projects\\Glaido Omni-Nexus\\tools\\core\\validator.py"
+          },
+          "validator_import": {
+            "error": null,
+            "has_validate_function": true,
+            "importable": true
+          }
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T14:43:51.355461+05:00"
+      },
+      "workspace_hygiene": {
+        "actionable": false,
+        "category": "workspace_hygiene",
+        "executed": true,
+        "exit_code": 0,
+        "message": "Workspace hygiene verified.",
+        "metrics": {
+          "duration_ms": 4.25
+        },
+        "remediation": "Move files to appropriate subdirectories (.tmp/, config/, tools/) or delete them. See verification_operational_guidelines.md.",
+        "results": {
+          "architecture_clean": true,
+          "root_clean": true,
+          "violations": []
+        },
+        "status": "ready",
+        "timestamp": "2026-02-20T14:43:50.783411+05:00"
+      }
+    }
+  },
+  "structure": {
+    "boundaries": [
+      "Intelligence Wall (tools/core no AI)",
+      "Linear Pipeline (orchestrator execution)",
+      "Output Determinism (CLI JSON rendering)"
+    ],
+    "layers": {
+      "architecture": 0,
+      "cli": 4,
+      "navigation": 8,
+      "tools": 21
+    },
+    "modules": [
+      "cli/display",
+      "navigation/intelligence",
+      "navigation/orchestrator",
+      "navigation/routing",
+      "tools/agents",
+      "tools/core",
+      "tools/data",
+      "tools/intelligence",
+      "tools/utilities"
+    ],
+    "total_directories": 33,
+    "total_files": 105
+  },
+  "timestamp": "2026-02-20T09:43:51.515772+00:00"
+}

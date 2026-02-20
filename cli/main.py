@@ -134,7 +134,7 @@ def cmd_diagnostic(args):
     report = diagnostics.run_full_diagnostic()
     
     if args.json:
-        print(json.dumps(report, indent=2))
+        print(json.dumps(report, indent=2, sort_keys=True))
     else:
         diagnostics.print_diagnostic_report(report)
 
@@ -168,7 +168,7 @@ def cmd_route(args):
         decision = task_router.route_task(task_data)
         
         print(color("Routing Decision:", "lime", bold=True))
-        print(json.dumps(decision, indent=2))
+        print(json.dumps(decision, indent=2, sort_keys=True))
     
     except json.JSONDecodeError:
         error("Invalid JSON task data", service="cli")
@@ -196,6 +196,19 @@ def cmd_verify(args):
         # Parse JSON output
         try:
             verification_data = json.loads(result.stdout)
+            
+            # Omega Extension: Build Engine Snapshot
+            try:
+                # Add root to path so we can import navigation
+                workspace_root = Path(__file__).resolve().parents[1]
+                if str(workspace_root) not in sys.path:
+                    sys.path.insert(0, str(workspace_root))
+                    
+                from navigation.intelligence.engine_status import build_engine_snapshot
+                build_engine_snapshot(result.stdout)
+            except Exception:
+                pass # Silently fail if components are unreachable during snapshot building
+                
         except json.JSONDecodeError as e:
             error(f"Failed to parse orchestrator output: {e}", service="cli")
             if result.stdout:

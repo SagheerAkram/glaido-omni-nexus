@@ -54,7 +54,7 @@ def verify_command():
 
 ---
 
-### Stage 2: Orchestrator Invocation
+## Stage 2: Orchestrator Invocation
 
 **Component**: `navigation/orchestrator/verification_orchestrator.py`
 

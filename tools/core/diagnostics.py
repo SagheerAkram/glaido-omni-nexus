@@ -242,6 +242,6 @@ if __name__ == "__main__":
     report = run_full_diagnostic()
     
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
-        print(json.dumps(report, indent=2))
+        print(json.dumps(report, indent=2, sort_keys=True))
     else:
         print_diagnostic_report(report)

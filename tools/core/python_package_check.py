@@ -26,6 +26,7 @@ Integration (Architect phase only — DO NOT wire yet):
 
 import sys
 import json
+import time
 import importlib.util
 from datetime import datetime, timezone, timedelta
 
@@ -94,6 +95,7 @@ def run_check() -> dict:
     and the directive-specified format for the `dependency` category.
     """
     try:
+        start_time = time.time()
         result = check_packages()
 
         total = len(REQUIRED_PACKAGES)
@@ -118,10 +120,13 @@ def run_check() -> dict:
             )
 
         report = {
-            "category": "dependency",
+            "category": "python_packages",
             "status": status,
             "executed": True,
             "timestamp": _now_iso(),
+            "metrics": {
+                "duration_ms": round((time.time() - start_time) * 1000, 2)
+            },
             "results": {
                 "packages_checked": total,
                 "packages_present": present,
@@ -164,5 +169,5 @@ def run_check() -> dict:
 
 if __name__ == "__main__":
     output = run_check()
-    print(json.dumps(output, indent=2))
+    print(json.dumps(output, indent=2, sort_keys=True))
     sys.exit(0 if output["status"] == "ready" else 1)

@@ -127,7 +127,7 @@ def command_handler():
     Location: agents/agent_example/
 ```
 
-### Error Output
+## Error Output
 ```python
 error("Agent ID 'agent_example' already exists")
 info("Use --force to overwrite")

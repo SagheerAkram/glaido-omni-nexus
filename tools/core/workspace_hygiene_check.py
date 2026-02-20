@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
 import os
 import sys
 import json
+import time
 import pathlib
 import datetime
 
@@ -109,6 +109,7 @@ def scan_tools(root_path: pathlib.Path) -> list:
 def run_check():
     """Main execution logic."""
     try:
+        start_time = time.time()
         root_path = pathlib.Path.cwd()
         timestamp = _get_timestamp()
         
@@ -128,6 +129,9 @@ def run_check():
             "category": TOOL_CATEGORY,
             "status": status,
             "timestamp": timestamp,
+            "metrics": {
+                "duration_ms": round((time.time() - start_time) * 1000, 2)
+            },
             "results": {
                 "root_clean": len([v for v in all_violations if v['location'] == 'root']) == 0,
                 "architecture_clean": len([v for v in all_violations if v['location'] == 'architecture']) == 0,
@@ -138,11 +142,7 @@ def run_check():
             "remediation": "Move files to appropriate subdirectories (.tmp/, config/, tools/) or delete them. See verification_operational_guidelines.md."
         }
         
-        # Output JSON
-        print(json.dumps(report, indent=2))
-        
-        # Exit Code
-        sys.exit(0 if status == "ready" else 1)
+        return report
 
     except Exception as e:
         # Fallback for catastrophic failure
@@ -153,8 +153,11 @@ def run_check():
             "error": str(e),
             "message": "Internal tool error during hygiene check."
         }
-        print(json.dumps(error_report, indent=2))
-        sys.exit(1)
+        return error_report
 
 if __name__ == "__main__":
-    run_check()
+    result = run_check()
+    print(json.dumps(result, indent=2, sort_keys=True))
+    
+    # Exit with non-zero if not ready
+    sys.exit(0 if result.get("status") == "ready" else 1)

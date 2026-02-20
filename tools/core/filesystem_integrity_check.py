@@ -7,7 +7,13 @@ Derived from: architecture/sops/link_verification_protocol.md (Section 2)
 
 import sys
 import json
+import time
+from datetime import datetime, timezone
 from pathlib import Path
+
+def _get_timestamp():
+    """Return ISO 8601 timestamp with timezone"""
+    return datetime.now(timezone.utc).astimezone().isoformat()
 
 # Required A.N.T. directories (from system diagnostics)
 REQUIRED_DIRECTORIES = [
@@ -136,6 +142,7 @@ def check_temp_writable():
 
 def run_check():
     """Execute filesystem integrity checks"""
+    start_time = time.time()
     dirs = check_directories()
     files = check_core_files()
     arch = check_architecture_immutable()
@@ -147,19 +154,26 @@ def run_check():
     temp_ok = temp["writable"]
     
     if dirs_ok and files_ok and temp_ok:
-        status = "healthy"
-    elif dirs_ok and files_ok:
-        status = "degraded"  # temp not writable
+        status = "ready"
     else:
         status = "error"
     
     report = {
         "category": "filesystem_integrity",
         "status": status,
-        "directories": dirs,
-        "core_files": files,
-        "architecture_immutable": arch["conceptually_immutable"],
-        "temp_writable": temp["writable"]
+        "timestamp": _get_timestamp(),
+        "metrics": {
+            "duration_ms": round((time.time() - start_time) * 1000, 2)
+        },
+        "results": {
+            "directories": dirs,
+            "core_files": files,
+            "architecture_immutable": arch["conceptually_immutable"],
+            "temp_writable": temp["writable"]
+        },
+        "message": "Filesystem integrity verified" if status == "ready" else "Filesystem integrity violations detected",
+        "actionable": status == "error",
+        "remediation": "Restore missing directories or files" if status == "error" else None
     }
     
     return report
@@ -167,8 +181,8 @@ def run_check():
 
 if __name__ == "__main__":
     result = run_check()
-    print(json.dumps(result, indent=2))
+    print(json.dumps(result, indent=2, sort_keys=True))
     
     # Exit with status code
-    exit_code = 0 if result["status"] == "healthy" else 1
+    exit_code = 0 if result["status"] == "ready" else 1
     sys.exit(exit_code)

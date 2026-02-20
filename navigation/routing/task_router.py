@@ -242,7 +242,7 @@ if __name__ == "__main__":
     try:
         task_data = json.loads(sys.argv[1])
         decision = route_task(task_data)
-        print(json.dumps(decision, indent=2))
+        print(json.dumps(decision, indent=2, sort_keys=True))
     except json.JSONDecodeError as e:
         error(f"Invalid JSON: {e}", service="navigation")
         sys.exit(1)

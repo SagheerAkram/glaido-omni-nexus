@@ -7,7 +7,13 @@ Derived from: architecture/sops/link_verification_protocol.md (Section 1)
 
 import sys
 import json
+import time
+from datetime import datetime, timezone
 from pathlib import Path
+
+def _get_timestamp():
+    """Return ISO 8601 timestamp with timezone"""
+    return datetime.now(timezone.utc).astimezone().isoformat()
 
 # Required standard library modules for Omni-Nexus
 REQUIRED_MODULES = [
@@ -87,6 +93,7 @@ def check_filesystem_writable():
 
 def run_check():
     """Execute all local dependency checks"""
+    start_time = time.time()
     python_check = check_python_version()
     modules_check = check_required_modules()
     filesystem_check = check_filesystem_writable()
@@ -97,13 +104,23 @@ def run_check():
         modules_check["all_available"] and
         filesystem_check["writable"]
     )
+    status = "ready" if all_ready else "error"
     
     report = {
         "category": "local_dependencies",
-        "status": "ready" if all_ready else "not_ready",
-        "python_version": python_check,
-        "modules": modules_check,
-        "filesystem": filesystem_check
+        "status": status,
+        "timestamp": _get_timestamp(),
+        "metrics": {
+            "duration_ms": round((time.time() - start_time) * 1000, 2)
+        },
+        "results": {
+            "python_version": python_check,
+            "modules": modules_check,
+            "filesystem": filesystem_check
+        },
+        "message": "Local dependencies verified" if status == "ready" else "Local dependency failure",
+        "actionable": status == "error",
+        "remediation": "Check python version and pip modules" if status == "error" else None
     }
     
     return report
@@ -111,7 +128,7 @@ def run_check():
 
 if __name__ == "__main__":
     result = run_check()
-    print(json.dumps(result, indent=2))
+    print(json.dumps(result, indent=2, sort_keys=True))
     
     # Exit with non-zero if not ready
     sys.exit(0 if result["status"] == "ready" else 1)

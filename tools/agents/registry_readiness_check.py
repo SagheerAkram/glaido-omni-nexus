@@ -194,7 +194,7 @@ def run_check():
 
 if __name__ == "__main__":
     result = run_check()
-    print(json.dumps(result, indent=2))
+    print(json.dumps(result, indent=2, sort_keys=True))
     
     # Exit with status
     sys.exit(0 if result["status"] == "ready" else 1)

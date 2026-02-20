@@ -14,6 +14,7 @@ import sys
 import os
 import json
 import ast
+import time
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -107,6 +108,7 @@ def run_check():
     """
     Main execution logic.
     """
+    start_time = time.time()
     root = get_workspace_root()
     files_checked = 0
     violations = []
@@ -144,6 +146,9 @@ def run_check():
         "category": TOOL_CATEGORY,
         "status": status,
         "timestamp": _get_timestamp(),
+        "metrics": {
+            "duration_ms": round((time.time() - start_time) * 1000, 2)
+        },
         "results": {
             "files_checked": files_checked,
             "syntax_errors": len(violations),
@@ -164,7 +169,7 @@ def run_check():
 if __name__ == "__main__":
     try:
         report = run_check()
-        print(json.dumps(report, indent=2))
+        print(json.dumps(report, indent=2, sort_keys=True))
         sys.exit(0 if report["status"] == "ready" else 1)
     except Exception as e:
         # Fallback for catastrophic failure
@@ -181,5 +186,5 @@ if __name__ == "__main__":
             "actionable": True,
             "remediation": "Debug python_syntax_check.py"
         }
-        print(json.dumps(fallback, indent=2))
+        print(json.dumps(fallback, indent=2, sort_keys=True))
         sys.exit(1)

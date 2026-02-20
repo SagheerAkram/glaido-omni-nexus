@@ -73,24 +73,17 @@ def run_sequential_verification():
     """
     Run all verification tools in sequential order.
     No decision logic - just linear execution.
-    
-    Execution Order (from link_verification_protocol.md):
-    1. Local Dependencies (CRITICAL)
-    2. Filesystem Integrity (CRITICAL)
-    3. Schema Validation (IMPORTANT)
-    4. Agent Registry (IMPORTANT)
-    
-    Returns:
-        dict: Aggregated verification report
     """
     workspace = get_workspace_root()
-    
-    # Define tool paths in sequential order
-    # Architect Phase (2026-02-19): python_package_check inserted at position 3
+
+    # Finalized Pipeline Execution Order
     tools = [
         ("local_dependencies",    workspace / "tools/core/local_dependency_check.py"),
         ("workspace_hygiene",     workspace / "tools/core/workspace_hygiene_check.py"),
         ("python_syntax",         workspace / "tools/core/python_syntax_check.py"),
+        ("ant_boundary",          workspace / "tools/core/ant_boundary_enforcer.py"),
+        ("orphaned_tools",        workspace / "tools/core/orphaned_tool_verifier.py"),
+        ("architecture_links",    workspace / "tools/core/architecture_link_validator.py"),
         ("filesystem_integrity",  workspace / "tools/core/filesystem_integrity_check.py"),
         ("python_packages",       workspace / "tools/core/python_package_check.py"),
         ("schema_validation",     workspace / "tools/core/schema_validator_stub.py"),
@@ -124,7 +117,7 @@ def run_sequential_verification():
 
 if __name__ == "__main__":
     result = run_sequential_verification()
-    print(json.dumps(result, indent=2))
+    print(json.dumps(result, indent=2, sort_keys=True))
     
     # Exit with status
     sys.exit(0 if result["overall_status"] == "ready" else 1)

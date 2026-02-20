@@ -11,7 +11,13 @@ This tool checks that the validator is ready for use.
 
 import sys
 import json
+import time
+from datetime import datetime, timezone
 from pathlib import Path
+
+def _get_timestamp():
+    """Return ISO 8601 timestamp with timezone"""
+    return datetime.now(timezone.utc).astimezone().isoformat()
 
 
 def check_validator_exists():
@@ -88,6 +94,7 @@ def check_schema_documentation():
 
 def run_check():
     """Execute schema validation readiness checks"""
+    start_time = time.time()
     validator_file = check_validator_exists()
     validator_import = check_validator_importable()
     schema_docs = check_schema_documentation()
@@ -99,13 +106,23 @@ def run_check():
         validator_import["has_validate_function"] and
         schema_docs.get("exists", False)
     )
+    status = "ready" if ready else "error"
     
     report = {
         "category": "schema_validation",
-        "status": "ready" if ready else "not_ready",
-        "validator_file": validator_file,
-        "validator_import": validator_import,
-        "schema_documentation": schema_docs
+        "status": status,
+        "timestamp": _get_timestamp(),
+        "metrics": {
+            "duration_ms": round((time.time() - start_time) * 1000, 2)
+        },
+        "results": {
+            "validator_file": validator_file,
+            "validator_import": validator_import,
+            "schema_documentation": schema_docs
+        },
+        "message": "Schema validator stub verified" if status == "ready" else "Schema validator stub failed",
+        "actionable": status == "error",
+        "remediation": "Ensure tools/core/validator.py exists and handles valid schemas" if status == "error" else None
     }
     
     return report
@@ -113,7 +130,7 @@ def run_check():
 
 if __name__ == "__main__":
     result = run_check()
-    print(json.dumps(result, indent=2))
+    print(json.dumps(result, indent=2, sort_keys=True))
     
     # Exit with status
     sys.exit(0 if result["status"] == "ready" else 1)

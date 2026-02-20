@@ -126,7 +126,7 @@ def classify_task(task_request):
 
 ---
 
-### Step 2: Target Resolution
+## Step 2: Target Resolution
 **Tool**: `navigation/orchestrator/task_router.py`
 
 **Input**: Route type + task requirements  
@@ -212,7 +212,7 @@ def route_task(data):
     return call_tool(transformed)
 ```
 
-### ✅ Correct Pattern
+## ✅ Correct Pattern
 ```python
 # CORRECT
 def route_task(data):
@@ -221,7 +221,7 @@ def route_task(data):
 
 ---
 
-### ❌ Complex Logic in Navigation
+## ❌ Complex Logic in Navigation
 ```python
 # FORBIDDEN
 def decide_target(task):
@@ -229,7 +229,7 @@ def decide_target(task):
         # ... 50 lines of decision logic ❌
 ```
 
-### ✅ Correct Pattern
+## ✅ Correct Pattern
 ```python
 # CORRECT
 def decide_target(task):

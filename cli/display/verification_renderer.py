@@ -51,22 +51,22 @@ def _render_success_state(data):
     
     # Banner
     lines.append("")
-    lines.append(formatter.create_banner("SYSTEM VERIFICATION COMPLETE", width=60))
+    lines.append(formatter.create_banner("GLAIDO OMNI-NEXUS — ENGINEERING VERIFICATION CORE", width=70))
     lines.append("")
     
     # Summary
-    lines.append(formatter.lime("Overall Status:") + " READY")
-    lines.append(formatter.lime("System Ready:") + " Yes")
+    lines.append(formatter.kv_pair("Overall Status", "READY", align=18))
+    lines.append(formatter.kv_pair("System Ready", "Yes", align=18))
     
     timestamp = data.get("timestamp", "")
     if timestamp:
-        lines.append(formatter.lime("Verified at:") + f" {timestamp}")
+        lines.append(formatter.kv_pair("Verified at", timestamp, align=18))
     
     lines.append("")
     
     # Tool results table
     headers = ["Component", "Status", "Details"]
-    rows = _build_success_rows(data.get("verifications", {}))
+    rows = _build_verification_rows(data.get("verifications", {}))
     
     if rows:
         lines.append(formatter.create_table(headers, rows))
@@ -80,16 +80,20 @@ def _render_success_state(data):
     return "\n".join(lines)
 
 
-def _build_success_rows(verifications):
-    """Build table rows for success state"""
+def _build_verification_rows(verifications):
+    """Build table rows for all states"""
     rows = []
     
     # Define display order and labels
     # Stylize Phase (2026-02-19): python_packages added at position 3
+    # Expansion Cycle 4: Execution Intelligence labels added
     tool_labels = {
         "local_dependencies":   "Local Dependencies",
         "workspace_hygiene":    "Workspace Hygiene",
         "python_syntax":        "Python Syntax",
+        "ant_boundary":         "A.N.T Boundary",
+        "pipeline_integrity":   "Pipeline Integrity",
+        "architecture_links":   "Architecture Links",
         "filesystem_integrity": "Filesystem Integrity",
         "python_packages":      "Python Packages",
         "schema_validation":    "Schema Validation",
@@ -108,15 +112,21 @@ def _build_success_rows(verifications):
                 status_text = status.upper()
             
             # Build details
-            details = _extract_success_details(category, tool_data)
+            details = _extract_details(category, tool_data)
             
             rows.append([label, status_text, details])
     
     return rows
 
 
-def _extract_success_details(category, tool_data):
-    """Extract key details for success display"""
+def _extract_details(category, tool_data):
+    """Extract key details for table display"""
+    status = tool_data.get("status", "unknown")
+    
+    # Fallback to error message if not ready
+    if status not in ["ready", "healthy"] and tool_data.get("message"):
+        return tool_data.get("message")
+        
     if category == "local_dependencies":
         py_ver = tool_data.get("python_version", {}).get("current", "")
         return f"Python {py_ver}" if py_ver else "All OK"
@@ -143,6 +153,15 @@ def _extract_success_details(category, tool_data):
     elif category == "agent_registry":
         count = tool_data.get("agent_count", 0)
         return f"{count} agents"
+        
+    elif category == "ant_boundary":
+        return "Layer boundaries respected"
+
+    elif category == "pipeline_integrity":
+        return "All tools registered"
+
+    elif category == "architecture_links":
+        return "No broken architecture links"
 
     return "OK"
 
@@ -157,26 +176,25 @@ def _render_warning_state(data):
     
     # Banner
     lines.append("")
-    lines.append(formatter.create_banner("VERIFICATION COMPLETE WITH WARNINGS", width=60))
+    lines.append(formatter.create_banner("GLAIDO OMNI-NEXUS — ENGINEERING VERIFICATION CORE", width=70))
     lines.append("")
     
     # Summary
-    lines.append(formatter.lime("Overall Status:") + " OPERATIONAL (with warnings)")
-    lines.append(formatter.lime("System Ready:") + " Yes (degraded)")
+    lines.append(formatter.kv_pair("Overall Status", "OPERATIONAL (with warnings)", align=18))
+    lines.append(formatter.kv_pair("System Ready", "Yes (degraded)", align=18))
     
     timestamp = data.get("timestamp", "")
     if timestamp:
-        lines.append(formatter.lime("Verified at:") + f" {timestamp}")
+        lines.append(formatter.kv_pair("Verified at", timestamp, align=18))
     
     lines.append("")
     
     # Tool results
-    lines.append(formatter.lime("Verification Results:"))
-    lines.append("")
+    headers = ["Component", "Status", "Details"]
+    rows = _build_verification_rows(data.get("verifications", {}))
     
-    for category, tool_data in data.get("verifications", {}).items():
-        status_line = _format_tool_status_line(category, tool_data, show_warnings=True)
-        lines.append(status_line)
+    if rows:
+        lines.append(formatter.create_table(headers, rows))
     
     lines.append("")
     
@@ -230,39 +248,50 @@ def _render_failure_state(data):
     
     # Banner
     lines.append("")
-    lines.append(formatter.create_banner("SYSTEM VERIFICATION FAILED", width=60))
+    lines.append(formatter.create_banner("GLAIDO OMNI-NEXUS — ENGINEERING VERIFICATION CORE", width=70))
     lines.append("")
     
     # Summary
-    lines.append(formatter.lime("Overall Status:") + " " + formatter.red("NOT READY"))
-    lines.append(formatter.lime("System Ready:") + " " + formatter.red("No"))
+    lines.append(formatter.kv_pair("Overall Status", formatter.red("NOT READY"), align=18))
+    lines.append(formatter.kv_pair("System Ready", formatter.red("No"), align=18))
     
     # Count failures
     failure_count = _count_failures(data.get("verifications", {}))
-    lines.append(formatter.lime("Critical Failures:") + f" {failure_count}")
+    lines.append(formatter.kv_pair("Critical Failures", str(failure_count), align=18))
     
     timestamp = data.get("timestamp", "")
     if timestamp:
-        lines.append(formatter.lime("Verified at:") + f" {timestamp}")
+        lines.append(formatter.kv_pair("Verified at", timestamp, align=18))
     
     lines.append("")
     
-    # Tool results
-    lines.append(formatter.lime("Verification Results:"))
-    lines.append("")
+    # Tool results table
+    headers = ["Component", "Status", "Details"]
+    rows = _build_verification_rows(data.get("verifications", {}))
     
-    for category, tool_data in data.get("verifications", {}).items():
-        status_line = _format_tool_status_line(category, tool_data, show_errors=True)
-        lines.append(status_line)
+    if rows:
+        lines.append(formatter.create_table(headers, rows))
         
-        # Show error details if present
+    lines.append("")
+    
+    # Print error details
+    has_errors = False
+    for category, tool_data in data.get("verifications", {}).items():
         if tool_data.get("status") not in ["ready", "healthy"]:
             error_details = _extract_error_details(category, tool_data)
             if error_details:
+                if not has_errors:
+                    lines.append(formatter.lime("Error Details:"))
+                    lines.append("")
+                    has_errors = True
+                
+                label = category.replace("_", " ").title()
+                lines.append(f"  {formatter.red(label)}:")
                 for detail in error_details:
-                    lines.append(f"  {detail}")
+                    lines.append(f"    • {detail}")
     
-    lines.append("")
+    if has_errors:
+        lines.append("")
     
     # Impact assessment
     lines.append(formatter.lime("Impact:"))
@@ -366,7 +395,31 @@ def _extract_error_details(category, tool_data):
             details.append("Registry file not found")
         elif not tool_data.get("registry_valid_json"):
             details.append("Registry file is not valid JSON")
-    
+
+    elif category == "ant_boundary":
+        violations = tool_data.get("results", {}).get("violations", [])
+        count = len(violations)
+        details.append(f"{count} violation(s) detected")
+        if violations:
+            first = violations[0]
+            details.append(f"First error: {first.get('import')} in {first.get('file')}:{first.get('line')}")
+
+    elif category == "pipeline_integrity":
+        violations = tool_data.get("results", {}).get("violations", [])
+        count = len(violations)
+        details.append(f"{count} orphaned tool(s) detected")
+        if violations:
+            first = violations[0]
+            details.append(f"First error: {first.get('file')} {first.get('reason')}")
+
+    elif category == "architecture_links":
+        violations = tool_data.get("results", {}).get("violations", [])
+        count = len(violations)
+        details.append(f"{count} broken link(s) detected")
+        if violations:
+            first = violations[0]
+            details.append(f"First error: {first.get('broken_link')} in {first.get('file')}:{first.get('line')}")
+
     return details
 
 
@@ -439,6 +492,9 @@ def _format_tool_status_line(category, tool_data, show_warnings=False, show_erro
         "local_dependencies":   "Local Dependencies",
         "workspace_hygiene":    "Workspace Hygiene",
         "python_syntax":        "Python Syntax",
+        "ant_boundary":         "A.N.T Boundary",
+        "pipeline_integrity":   "Pipeline Integrity",
+        "architecture_links":   "Architecture Links",
         "filesystem_integrity": "Filesystem Integrity",
         "python_packages":      "Python Packages",
         "schema_validation":    "Schema Validation",

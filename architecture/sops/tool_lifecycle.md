@@ -221,7 +221,7 @@ def transform_data(input_str):
     return f"{input_str}_{random.randint(1, 100)}"  # ❌ Random output
 ```
 
-### File-Based Persistence
+## File-Based Persistence
 ```python
 # ✅ CORRECT
 def save_data(data):
@@ -234,7 +234,7 @@ def save_data(data):
     db.insert(data)  # ❌ No external databases
 ```
 
-### Offline-First
+## Offline-First
 ```python
 # ✅ CORRECT
 def get_config():

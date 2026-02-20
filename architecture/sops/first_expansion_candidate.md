@@ -288,7 +288,7 @@ def verify_system():
     return aggregate_results(results)
 ```
 
-### Post-Expansion Structure
+## Post-Expansion Structure
 
 ```python
 # navigation/orchestrator/verification_orchestrator.py (updated)
@@ -311,7 +311,7 @@ def verify_system():
     return aggregate_results(results)
 ```
 
-### Key Integration Points
+## Key Integration Points
 
 **1. Orchestrator Modification (Navigation Layer)**
 - **Change**: Add tool path to `tools` list

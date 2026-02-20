@@ -184,8 +184,8 @@ if __name__ == "__main__":
     
     if is_valid:
         success(f"Validation passed for {schema_type}")
-        print(json.dumps({"status": "valid"}))
+        print(json.dumps({"status": "valid"}, sort_keys=True))
     else:
         error(f"Validation failed: {error_msg}")
-        print(json.dumps({"status": "invalid", "error": error_msg}))
+        print(json.dumps({"status": "invalid", "error": error_msg}, sort_keys=True))
         sys.exit(1)

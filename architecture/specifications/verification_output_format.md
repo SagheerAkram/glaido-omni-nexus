@@ -260,7 +260,7 @@ else:
     print_details(result["verifications"])
 ```
 
-### Diagnostic Tools
+## Diagnostic Tools
 
 **Usage**: Check system health
 
